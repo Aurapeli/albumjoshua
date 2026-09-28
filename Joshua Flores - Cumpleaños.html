@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Joshua Flores - Álbum de Recuerdos</title>
+<meta name="description" content="Álbum digital de recuerdos del cumpleaños de Joshua Flores">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23c40b16'/%3E%3Cpath d='M50 2V98M2 50H98M15 15L85 85M85 15L15 85' stroke='black' stroke-width='2'/%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red-dark:#5c0009;
+    --red:#c40b16;
+    --red-light:#ff3b3f;
+    --blue-dark:#050b1f;
+    --blue:#0b1f4d;
+    --blue-light:#1e50c8;
+    --black:#03050c;
+    --white:#f5f7fb;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:var(--black);
+    color:var(--white);
+    overflow-x:hidden;
+    margin:0;
+  }
+  .font-comic{font-family:'Bangers',cursive; letter-spacing:1.5px;}
+  ::selection{background:var(--red); color:white;}
+
+  /* ---------- SCROLLBAR ---------- */
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-track{background:var(--black);}
+  ::-webkit-scrollbar-thumb{background:var(--red); border-radius:10px;}
+
+  /* ---------- BACKGROUND TEXTURES ---------- */
+  .halftone{
+    position:absolute; inset:0; pointer-events:none;
+    background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1.6px);
+    background-size: 16px 16px;
+    opacity:.35;
+  }
+  .speedlines{
+    position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    background: repeating-linear-gradient(115deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 40px);
+    mix-blend-mode: screen;
+  }
+  .hero-gradient{
+    background:
+      radial-gradient(circle at 15% 15%, rgba(196,11,22,0.55), transparent 45%),
+      radial-gradient(circle at 85% 20%, rgba(30,80,200,0.5), transparent 50%),
+      linear-gradient(170deg, var(--black) 0%, var(--blue-dark) 35%, var(--blue) 65%, var(--red-dark) 100%);
+  }
+  .section-gradient-b{
+    background: linear-gradient(180deg, var(--blue-dark) 0%, #0a1230 60%, var(--black) 100%);
+  }
+
+  /* ---------- WEB CORNERS ---------- */
+  .web-corner{position:absolute; width:150px; height:150px; opacity:.35; pointer-events:none;}
+  @media(min-width:768px){.web-corner{width:220px; height:220px;}}
+
+  /* ---------- REVEAL ANIMATION ---------- */
+  .reveal{opacity:0; transform:translateY(35px); transition:opacity .8s ease, transform .8s ease;}
+  .reveal.visible{opacity:1; transform:translateY(0);}
+
+  /* ---------- BUTTONS ---------- */
+  .btn-hero{
+    display:inline-flex; align-items:center; justify-content:center; gap:.75rem;
+    background:linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    border:2px solid rgba(255,255,255,0.25);
+    box-shadow: 0 10px 30px rgba(196,11,22,0.45), inset 0 0 0 1px rgba(255,255,255,0.05);
+    transition: transform .25s ease, box-shadow .25s ease;
+    cursor: pointer;
+  }
+  .btn-hero:hover{ transform:translateY(-3px) scale(1.03); box-shadow:0 16px 40px rgba(196,11,22,0.65);}
+  .btn-hero:active{transform:translateY(0) scale(.98);}
+
+  .btn-blue{
+    display:inline-flex; align-items:center; justify-content:center; gap:.65rem;
+    background:linear-gradient(135deg, var(--blue-light) 0%, var(--blue-dark) 100%);
+    box-shadow:0 10px 26px rgba(30,80,200,0.4);
+    transition: transform .25s ease, box-shadow .25s ease;
+    cursor: pointer;
+  }
+  .btn-blue:hover{transform:translateY(-3px) scale(1.03); box-shadow:0 16px 36px rgba(30,80,200,0.6);}
+
+  /* ---------- NAV ---------- */
+  #siteNav{ transition: background .4s ease, box-shadow .4s ease; }
+  #siteNav.scrolled{ background:rgba(3,5,12,0.85); backdrop-filter:blur(10px); box-shadow:0 8px 25px rgba(0,0,0,.5);}
+
+  @keyframes spin-slow{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  .spin-slow{ animation:spin-slow 40s linear infinite; }
+
+  @keyframes pulseGlow{
+    0%,100%{ filter:drop-shadow(0 0 12px rgba(196,11,22,.6)); }
+    50%{ filter:drop-shadow(0 0 28px rgba(30,80,200,.8)); }
+  }
+  .pulse-glow{ animation:pulseGlow 3.5s ease-in-out infinite; }
+
+  /* ---------- MASONRY GALLERY ---------- */
+  .masonry{ column-count:1; column-gap:1rem; }
+  @media(min-width:640px){ .masonry{column-count:2;} }
+  @media(min-width:1024px){ .masonry{column-count:3;} }
+  .masonry-item{
+    break-inside: avoid; margin-bottom:1rem; position:relative; border-radius:18px; overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.5);
+    border:1px solid rgba(255,255,255,0.08);
+    cursor:pointer;
+  }
+  .masonry-item img, .masonry-item video{
+    width:100%; display:block; transition:transform .5s ease, filter .5s ease;
+  }
+  .masonry-item:hover img, .masonry-item:hover video{ transform:scale(1.06); }
+  .masonry-item .overlay{
+    position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.85), transparent 55%);
+    opacity:0; transition:opacity .35s ease; display:flex; flex-direction:column; justify-content:flex-end; padding:.9rem;
+  }
+  .masonry-item:hover .overlay{ opacity:1; }
+  .play-badge{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:56px; height:56px; border-radius:50%;
+    background:rgba(3,5,12,.65); border:2px solid white;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+
+  /* ---------- MODAL ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(2,4,10,0.88); backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; z-index:100;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+    padding:1rem;
+  }
+  .modal-backdrop.active{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    background:linear-gradient(160deg, #0b1230, #03050c);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:22px; max-width:560px; width:100%; max-height:92vh; overflow-y:auto;
+    transform: translateY(30px) scale(.97); transition:transform .35s ease;
+    box-shadow:0 30px 80px rgba(0,0,0,.8);
+  }
+  .modal-backdrop.active .modal-box{ transform:translateY(0) scale(1); }
+
+  .drop-zone{
+    border:2px dashed rgba(255,255,255,0.25); border-radius:16px;
+    transition: border-color .25s ease, background .25s ease;
+  }
+  .drop-zone.dragover{ border-color:var(--red-light); background:rgba(196,11,22,.08); }
+
+  .file-item{
+    display:flex; align-items:center; gap:.75rem;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px; padding:.6rem .75rem;
+  }
+  .progress-track{ background:rgba(255,255,255,0.12); border-radius:99px; overflow:hidden; height:6px; width:100%; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg, var(--red), var(--blue-light)); width:0%; transition:width .2s ease; }
+
+  /* ---------- LIGHTBOX ---------- */
+  #lightbox{
+    position:fixed; inset:0; background:rgba(2,3,8,.96); z-index:200;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  #lightbox.active{ opacity:1; pointer-events:auto; }
+  #lightbox img, #lightbox video{ max-width:92vw; max-height:82vh; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.7); }
+  .lb-btn{
+    width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.08);
+    display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.2);
+    transition:background .25s ease, transform .2s ease;
+    cursor: pointer;
+  }
+  .lb-btn:hover{ background:rgba(196,11,22,.6); transform:scale(1.08); }
+
+  /* ---------- checkmark success ---------- */
+  .check-circle{ stroke-dasharray:166; stroke-dashoffset:166; animation:dash .6s ease-out forwards; }
+  .check-mark{ stroke-dasharray:48; stroke-dashoffset:48; animation:dash 0.4s .5s ease-out forwards; }
+  @keyframes dash{ to{ stroke-dashoffset:0; } }
+
+  .hide-scrollbar::-webkit-scrollbar{ display:none; }
+</style>
+</head>
+<body class="font-body">
+
+<!-- ============ SVG SPRITE DEFS ============ -->
+<svg width="0" height="0" style="position:absolute">
+<defs>
+  <!-- Web pattern symbol -->
+  <symbol id="webSymbol" viewBox="0 0 200 200">
+    <g fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
+      <line x1="100" y1="100" x2="195" y2="100"/>
+      <line x1="100" y1="100" x2="167.2" y2="167.2"/>
+      <line x1="100" y1="100" x2="100" y2="195"/>
+      <line x1="100" y1="100" x2="32.8" y2="167.2"/>
+      <line x1="100" y1="100" x2="5" y2="100"/>
+      <line x1="100" y1="100" x2="32.8" y2="32.8"/>
+      <line x1="100" y1="100" x2="100" y2="5"/>
+      <line x1="100" y1="100" x2="167.2" y2="32.8"/>
+      <polygon points="140,100 128.28,128.28 100,140 71.72,128.28 60,100 71.72,71.72 100,60 128.28,71.72"/>
+      <polygon points="170,100 149.5,149.5 100,170 50.5,149.5 30,100 50.5,50.5 100,30 149.5,50.5"/>
+    </g>
+  </symbol>
+
+  <!-- Icons -->
+  <symbol id="iconWeb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20M4.5 4.5l15 15M19.5 4.5l-15 15"/><path d="M12 6l4 2-1 4-4 2-4-2-1-4z"/></g></symbol>
+  <symbol id="iconCamera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="4"/></g></symbol>
+  <symbol id="iconVideo" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3z"/></g></symbol>
+  <symbol id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+  <symbol id="iconClose" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></g></symbol>
+  <symbol id="iconArrowLeft" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="iconArrowRight" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="iconUpload" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></g></symbol>
+  <symbol id="iconUser" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></g></symbol>
+</defs>
+</svg>
+
+<!-- ============ NAV ============ -->
+<header id="siteNav" class="fixed top-0 left-0 w-full z-50">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-5 md:px-8 py-4">
+    <a href="#inicio" class="flex items-center gap-2">
+      <svg viewBox="0 0 100 100" class="w-9 h-9"><circle cx="50" cy="50" r="48" fill="#c40b16"/><path d="M50 2V98M2 50H98M15 15L85 85M85 15L15 85" stroke="black" stroke-width="2.5"/></svg>
+      <span class="font-comic text-xl md:text-2xl text-white tracking-wide">JOSHUA<span class="text-red-500">FLORES</span></span>
+    </a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="inicio" class="relative min-h-screen hero-gradient flex items-center overflow-hidden pt-24 pb-16">
+  <div class="halftone"></div>
+  <div class="speedlines"></div>
+
+  <svg class="web-corner top-0 left-0 text-white" style="color:white"><use href="#webSymbol"/></svg>
+  <svg class="web-corner top-0 right-0 text-white spin-slow" style="transform:scaleX(-1)"><use href="#webSymbol"/></svg>
+  <svg class="web-corner bottom-0 left-0 text-white" style="transform:scaleY(-1)"><use href="#webSymbol"/></svg>
+
+  <div class="relative max-w-7xl mx-auto w-full px-5 md:px-10 grid md:grid-cols-2 items-center gap-10">
+    <div class="reveal order-2 md:order-1 text-center md:text-left">
+      <p class="font-comic text-red-500 text-xl md:text-2xl mb-2 tracking-widest">ÁLBUM DE RECUERDOS</p>
+      <h1 class="font-comic text-5xl sm:text-6xl md:text-7xl leading-none text-white drop-shadow-[0_6px_20px_rgba(196,11,22,0.6)]">
+        JOSHUA<br><span class="text-red-500">FLORES</span>
+      </h1>
+      <p class="text-white/80 text-lg mt-6 max-w-lg mx-auto md:mx-0">
+        Comparte tus mejores fotografías y videos para guardarlos en el álbum digital de recuerdos.
+      </p>
+      <div class="mt-8 flex justify-center md:justify-start">
+        <button onclick="openModal()" class="btn-hero text-white font-comic text-lg md:text-xl px-8 py-4 rounded-full tracking-wide">
+          <svg class="w-6 h-6"><use href="#iconCamera"/></svg>
+          SUBIR FOTOS O VIDEOS
+        </button>
+      </div>
+    </div>
+
+    <div class="order-1 md:order-2 flex justify-center relative">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <svg class="w-[380px] h-[380px] md:w-[520px] md:h-[520px] text-white opacity-10 spin-slow"><use href="#webSymbol"/></svg>
+      </div>
+      <div class="relative z-10 p-3 rounded-3xl bg-gradient-to-b from-red-600/40 via-blue-600/20 to-black border-2 border-white/20 shadow-2xl pulse-glow max-w-sm sm:max-w-md">
+        <img 
+          src="https://raw.githubusercontent.com/Aurapeli/auraflixs.github.io/refs/heads/main/IMG-20260927-WA0030.jpg" 
+          alt="Joshua Flores" 
+          class="w-full h-auto rounded-2xl object-cover shadow-lg"
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÁLBUM DE RECUERDOS (GALERÍA) ============ -->
+<section id="album" class="relative section-gradient-b py-20 md:py-28 px-5 overflow-hidden">
+  <svg class="web-corner top-0 left-0 text-white"><use href="#webSymbol"/></svg>
+
+  <div class="max-w-6xl mx-auto relative">
+    <div class="text-center mb-12 reveal">
+      <p class="font-comic text-red-400 tracking-widest mb-2">GALERÍA</p>
+      <h2 class="font-comic text-4xl md:text-6xl text-white">ÁLBUM DE RECUERDOS</h2>
+      <p class="text-white/60 mt-3">Momentos guardados por los invitados.</p>
+      <div class="w-24 h-1 bg-blue-500 mx-auto mt-4 rounded-full"></div>
+    </div>
+
+    <div id="galleryEmpty" class="text-center text-white/50 py-10 hidden">
+      Aún no hay recuerdos compartidos. Sé el primero en subir una fotografía o video.
+    </div>
+
+    <div id="masonryGallery" class="masonry reveal"></div>
+  </div>
+</section>
+
+<footer class="bg-black py-10 px-5 text-center border-t border-white/10">
+  <div class="flex items-center justify-center gap-2 mb-3">
+    <svg viewBox="0 0 100 100" class="w-7 h-7"><circle cx="50" cy="50" r="48" fill="#c40b16"/><path d="M50 2V98M2 50H98M15 15L85 85M85 15L15 85" stroke="black" stroke-width="2.5"/></svg>
+    <span class="font-comic text-lg text-white">JOSHUA FLORES</span>
+  </div>
+  <p class="text-white/40 text-sm">Álbum digital de recuerdos de Joshua Flores.</p>
+</footer>
+
+<!-- ============ UPLOAD MODAL ============ -->
+<div id="uploadModal" class="modal-backdrop">
+  <div class="modal-box p-6 md:p-8">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-comic text-2xl text-white">SUBIR RECUERDOS</h3>
+      <button id="closeModalBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-white">
+        <svg class="w-6 h-6"><use href="#iconClose"/></svg>
+      </button>
+    </div>
+
+    <div id="uploadStep">
+      <!-- Nombre del invitado -->
+      <div class="mb-5">
+        <label class="text-white/80 text-sm font-semibold flex items-center gap-2 mb-2">
+          <svg class="w-4 h-4 text-red-500"><use href="#iconUser"/></svg> TU NOMBRE (OBLIGATORIO)
+        </label>
+        <input id="guestName" type="text" placeholder="Escribe tu nombre (Ej: Pablo García)" class="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-red-500">
+      </div>
+
+      <!-- Área para seleccionar archivos -->
+      <label for="fileInput" class="drop-zone flex flex-col items-center justify-center gap-3 py-8 px-4 cursor-pointer text-center">
+        <svg class="w-10 h-10 text-red-500"><use href="#iconUpload"/></svg>
+        <span class="text-white font-semibold">Toca para seleccionar fotos o videos</span>
+        <span class="text-white/50 text-sm">Puedes elegir varios archivos a la vez</span>
+      </label>
+      <input type="file" id="fileInput" accept="image/*,video/*" multiple class="hidden">
+
+      <div id="fileListWrap" class="mt-5 space-y-3 max-h-48 overflow-y-auto hide-scrollbar hidden"></div>
+
+      <button id="startUploadBtn" disabled class="btn-hero w-full justify-center mt-6 py-4 rounded-xl font-comic text-lg text-white opacity-40 cursor-not-allowed">
+        <svg class="w-5 h-5"><use href="#iconWeb"/></svg>
+        SUBIR RECUERDOS
+      </button>
+    </div>
+
+    <div id="uploadingStep" class="hidden text-center py-6">
+      <svg class="w-14 h-14 text-red-500 mx-auto mb-4 animate-spin"><use href="#iconWeb"/></svg>
+      <p class="font-comic text-xl text-white mb-4">SUBIENDO RECUERDOS...</p>
+      <div class="progress-track mb-2"><div id="globalProgressFill" class="progress-fill"></div></div>
+      <p id="globalProgressText" class="text-white/60 text-sm">0%</p>
+    </div>
+
+    <div id="successStep" class="hidden text-center py-8">
+      <svg class="w-20 h-20 mx-auto mb-4" viewBox="0 0 52 52">
+        <circle class="check-circle" cx="26" cy="26" r="24" fill="none" stroke="#22c55e" stroke-width="3"/>
+        <path class="check-mark" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" d="M14 27l7 7 16-16"/>
+      </svg>
+      <p class="font-comic text-2xl text-white">RECUERDO GUARDADO</p>
+      <p class="text-white/60 mt-2">Gracias por compartir este momento con Joshua.</p>
+      <button id="uploadMoreBtn" class="btn-blue text-white font-comic mt-6 px-6 py-3 rounded-full">SUBIR MÁS RECUERDOS</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LIGHTBOX ============ -->
+<div id="lightbox">
+  <button id="lbClose" class="lb-btn absolute top-5 right-5 text-white z-10"><svg class="w-6 h-6"><use href="#iconClose"/></svg></button>
+  <button id="lbPrev" class="lb-btn absolute left-3 md:left-8 text-white z-10"><svg class="w-6 h-6"><use href="#iconArrowLeft"/></svg></button>
+  <button id="lbNext" class="lb-btn absolute right-3 md:right-8 text-white z-10"><svg class="w-6 h-6"><use href="#iconArrowRight"/></svg></button>
+  <div id="lbContent" class="flex flex-col items-center gap-3 px-4"></div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN CLOUDINARY
+===================================================================== */
+const CLOUDINARY_CONFIG = {
+  cloudName: "lyhwjxwo",
+  uploadPreset: "fotos_joshua",
+  resourceType: "auto"
+};
+
+/* =====================================================================
+   LIMPIEZA DE NOMBRE Y GENERACIÓN DE IDENTIFICADORES
+===================================================================== */
+function sanitizeGuestName(name) {
+  if (!name || !name.trim()) return "invitado";
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Eliminar tildes y diacríticos
+    .replace(/[^a-z0-9\s-]/g, "")     // Mantener solo letras, números, espacios y guiones
+    .replace(/\s+/g, "-")            // Reemplazar espacios por guiones
+    .replace(/-+/g, "-");            // Evitar guiones dobles
+}
+
+function prepareFilesInfo(files, rawGuestName) {
+  const cleanName = sanitizeGuestName(rawGuestName);
+  let imgIndex = 0;
+  let vidIndex = 0;
+
+  const now = new Date();
+  const timeStamp = now.getFullYear().toString() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0') +
+    String(now.getHours()).padStart(2, '0') +
+    String(now.getMinutes()).padStart(2, '0') +
+    String(now.getSeconds()).padStart(2, '0');
+
+  return files.map((file) => {
+    const isVideo = file.type.startsWith('video');
+    const extMatch = file.name.match(/\.([a-zA-Z0-9]+)$/);
+    const ext = extMatch ? extMatch[1].toLowerCase() : (isVideo ? 'mp4' : 'jpg');
+
+    let prefix = '';
+    let numStr = '';
+
+    if (isVideo) {
+      vidIndex++;
+      prefix = 'video';
+      numStr = String(vidIndex).padStart(2, '0');
+    } else {
+      imgIndex++;
+      prefix = 'imagen';
+      numStr = String(imgIndex).padStart(2, '0');
+    }
+
+    const baseName = `${prefix}-${cleanName}-${numStr}`;
+    const friendlyName = `${baseName}.${ext}`;
+    const internalPublicId = `${baseName}-${timeStamp}`;
+    const folderPath = `recuerdos/joshua/${cleanName}`;
+
+    return {
+      file,
+      cleanName,
+      friendlyName,
+      internalPublicId,
+      folderPath,
+      isVideo
+    };
+  });
+}
+
+/* =====================================================================
+   ALMACENAMIENTO LOCAL
+===================================================================== */
+const LOCAL_KEY = "joshua_memories_v2";
+
+function getLocalMemories(){
+  try{ return JSON.parse(localStorage.getItem(LOCAL_KEY)) || []; }
+  catch(e){ return []; }
+}
+function saveLocalMemory(memory){
+  const list = getLocalMemories();
+  list.unshift(memory);
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(list));
+}
+function saveMemory(memory){
+  saveLocalMemory(memory);
+}
+
+/* =====================================================================
+   NAV SCROLL
+===================================================================== */
+const siteNav = document.getElementById('siteNav');
+window.addEventListener('scroll', () => {
+  siteNav.classList.toggle('scrolled', window.scrollY > 30);
+});
+
+/* =====================================================================
+   SCROLL REVEAL
+===================================================================== */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+revealEls.forEach(el => io.observe(el));
+
+/* =====================================================================
+   GALERÍA
+===================================================================== */
+const masonryGallery = document.getElementById('masonryGallery');
+const galleryEmpty = document.getElementById('galleryEmpty');
+let mediaList = [];
+
+function renderGallery(){
+  masonryGallery.innerHTML = '';
+  if(mediaList.length === 0){
+    galleryEmpty.classList.remove('hidden');
+    return;
+  }
+  galleryEmpty.classList.add('hidden');
+  mediaList.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'masonry-item';
+    card.dataset.index = index;
+
+    if(item.tipo === 'video'){
+      card.innerHTML = `
+        <video src="${item.url}" muted playsinline preload="metadata"></video>
+        <div class="play-badge"><svg class="w-6 h-6 text-white"><use href="#iconPlay"/></svg></div>
+        <div class="overlay">
+          <p class="text-white text-sm font-semibold">${item.nombreInvitado || 'Invitado'}</p>
+          <p class="text-white/60 text-xs truncate">${item.friendlyName || ''}</p>
+        </div>`;
+    } else {
+      card.innerHTML = `
+        <img src="${item.url}" loading="lazy" alt="Recuerdo de Joshua Flores">
+        <div class="overlay">
+          <p class="text-white text-sm font-semibold">${item.nombreInvitado || 'Invitado'}</p>
+          <p class="text-white/60 text-xs truncate">${item.friendlyName || ''}</p>
+        </div>`;
+    }
+    card.addEventListener('click', () => openLightbox(index));
+    masonryGallery.appendChild(card);
+  });
+}
+
+function loadMemories(){
+  mediaList = getLocalMemories();
+  renderGallery();
+}
+loadMemories();
+
+/* =====================================================================
+   LIGHTBOX
+===================================================================== */
+const lightbox = document.getElementById('lightbox');
+const lbContent = document.getElementById('lbContent');
+let lbIndex = 0;
+
+function openLightbox(index){
+  lbIndex = index;
+  renderLightbox();
+  lightbox.classList.add('active');
+}
+function renderLightbox(){
+  const item = mediaList[lbIndex];
+  if(!item) return;
+  if(item.tipo === 'video'){
+    lbContent.innerHTML = `<video src="${item.url}" controls autoplay playsinline></video>
+      <p class="text-white/80 text-sm text-center">${item.nombreInvitado || 'Invitado'} ${item.friendlyName ? ' (' + item.friendlyName + ')' : ''}</p>`;
+  } else {
+    lbContent.innerHTML = `<img src="${item.url}" alt="Recuerdo">
+      <p class="text-white/80 text-sm text-center">${item.nombreInvitado || 'Invitado'} ${item.friendlyName ? ' (' + item.friendlyName + ')' : ''}</p>`;
+  }
+}
+document.getElementById('lbClose').addEventListener('click', () => lightbox.classList.remove('active'));
+document.getElementById('lbPrev').addEventListener('click', () => { lbIndex = (lbIndex - 1 + mediaList.length) % mediaList.length; renderLightbox(); });
+document.getElementById('lbNext').addEventListener('click', () => { lbIndex = (lbIndex + 1) % mediaList.length; renderLightbox(); });
+lightbox.addEventListener('click', (e) => { if(e.target === lightbox) lightbox.classList.remove('active'); });
+document.addEventListener('keydown', (e) => {
+  if(!lightbox.classList.contains('active')) return;
+  if(e.key === 'Escape') lightbox.classList.remove('active');
+  if(e.key === 'ArrowLeft') document.getElementById('lbPrev').click();
+  if(e.key === 'ArrowRight') document.getElementById('lbNext').click();
+});
+
+/* =====================================================================
+   MODAL DE SUBIDA
+===================================================================== */
+const uploadModal = document.getElementById('uploadModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const fileInput = document.getElementById('fileInput');
+const guestNameInput = document.getElementById('guestName');
+const fileListWrap = document.getElementById('fileListWrap');
+const startUploadBtn = document.getElementById('startUploadBtn');
+const uploadStep = document.getElementById('uploadStep');
+const uploadingStep = document.getElementById('uploadingStep');
+const successStep = document.getElementById('successStep');
+const globalProgressFill = document.getElementById('globalProgressFill');
+const globalProgressText = document.getElementById('globalProgressText');
+const uploadMoreBtn = document.getElementById('uploadMoreBtn');
+
+let selectedFiles = [];
+let preparedFiles = [];
+
+function openModal(){
+  uploadModal.classList.add('active');
+  resetModal();
+}
+function closeModal(){
+  uploadModal.classList.remove('active');
+}
+closeModalBtn.addEventListener('click', closeModal);
+uploadModal.addEventListener('click', (e) => { if(e.target === uploadModal) closeModal(); });
+
+function resetModal(){
+  selectedFiles = [];
+  preparedFiles = [];
+  fileInput.value = '';
+  fileListWrap.innerHTML = '';
+  fileListWrap.classList.add('hidden');
+  guestNameInput.value = '';
+  updateStartButton();
+  uploadStep.classList.remove('hidden');
+  uploadingStep.classList.add('hidden');
+  successStep.classList.add('hidden');
+  globalProgressFill.style.width = '0%';
+  globalProgressText.textContent = '0%';
+}
+uploadMoreBtn.addEventListener('click', resetModal);
+
+function formatBytes(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+fileInput.addEventListener('change', (e) => {
+  selectedFiles = Array.from(e.target.files);
+  refreshFilesPreview();
+});
+
+guestNameInput.addEventListener('input', () => {
+  refreshFilesPreview();
+});
+
+function refreshFilesPreview(){
+  if(selectedFiles.length > 0){
+    preparedFiles = prepareFilesInfo(selectedFiles, guestNameInput.value);
+    renderFileList();
+  } else {
+    preparedFiles = [];
+    fileListWrap.innerHTML = '';
+    fileListWrap.classList.add('hidden');
+  }
+  updateStartButton();
+}
+
+function renderFileList(){
+  fileListWrap.innerHTML = '';
+  if(preparedFiles.length === 0){
+    fileListWrap.classList.add('hidden');
+    return;
+  }
+  fileListWrap.classList.remove('hidden');
+
+  preparedFiles.forEach((item, i) => {
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.id = 'file-item-' + i;
+
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = 'w-12 h-12 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center flex-shrink-0';
+    if(item.isVideo){
+      thumbWrap.innerHTML = `<svg class="w-5 h-5 text-white/70"><use href="#iconVideo"/></svg>`;
+    } else {
+      const img = document.createElement('img');
+      img.className = 'w-full h-full object-cover';
+      const reader = new FileReader();
+      reader.onload = (ev) => { img.src = ev.target.result; };
+      reader.readAsDataURL(item.file);
+      thumbWrap.appendChild(img);
+    }
+
+    fileItem.innerHTML = `
+      <div></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-red-400 text-xs font-mono truncate font-semibold">${item.friendlyName}</p>
+        <p class="text-white/40 text-xs">${formatBytes(item.file.size)}</p>
+        <div class="progress-track mt-1"><div class="progress-fill" id="progress-${i}"></div></div>
+      </div>
+      <span class="text-xs text-white/50 flex-shrink-0" id="status-${i}">Listo</span>
+    `;
+    fileItem.querySelector('div').replaceWith(thumbWrap);
+    fileListWrap.appendChild(fileItem);
+  });
+}
+
+function updateStartButton(){
+  const hasFiles = selectedFiles.length > 0;
+  startUploadBtn.disabled = !hasFiles;
+  startUploadBtn.classList.toggle('opacity-40', !hasFiles);
+  startUploadBtn.classList.toggle('cursor-not-allowed', !hasFiles);
+}
+
+function uploadToCloudinary(item, onProgress){
+  return new Promise((resolve, reject) => {
+    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${CLOUDINARY_CONFIG.resourceType}/upload`;
+    const formData = new FormData();
+    formData.append('file', item.file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('folder', item.folderPath);
+    formData.append('public_id', item.internalPublicId);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.upload.onprogress = (e) => {
+      if(e.lengthComputable){
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if(xhr.status >= 200 && xhr.status < 300){
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(new Error('Error al subir el archivo'));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Error de conexión'));
+    xhr.send(formData);
+  });
+}
+
+startUploadBtn.addEventListener('click', async () => {
+  if(preparedFiles.length === 0) return;
+
+  const rawGuestName = guestNameInput.value.trim();
+
+  uploadStep.classList.add('hidden');
+  uploadingStep.classList.remove('hidden');
+
+  let completed = 0;
+  const total = preparedFiles.length;
+  const progressPerFile = new Array(total).fill(0);
+
+  function updateGlobalProgress(){
+    const avg = progressPerFile.reduce((a,b) => a+b, 0) / total;
+    globalProgressFill.style.width = avg + '%';
+    globalProgressText.textContent = Math.round(avg) + '%';
+  }
+
+  for(let i = 0; i < preparedFiles.length; i++){
+    const item = preparedFiles[i];
+    const statusEl = document.getElementById('status-' + i);
+    const progEl = document.getElementById('progress-' + i);
+
+    try{
+      if(statusEl) statusEl.textContent = 'Subiendo';
+      const result = await uploadToCloudinary(item, (pct) => {
+        progressPerFile[i] = pct;
+        updateGlobalProgress();
+        if(progEl) progEl.style.width = pct + '%';
+      });
+
+      const memory = {
+        url: result.secure_url,
+        tipo: item.isVideo ? 'video' : 'imagen',
+        nombreInvitado: rawGuestName || 'Invitado',
+        friendlyName: item.friendlyName,
+        fecha: new Date().toISOString()
+      };
+
+      saveMemory(memory);
+      mediaList.unshift(memory);
+
+      if(statusEl) statusEl.textContent = 'Listo';
+      completed++;
+    } catch(err) {
+      if(statusEl) statusEl.textContent = 'Error';
+      console.error(err);
+    }
+  }
+
+  renderGallery();
+  uploadingStep.classList.add('hidden');
+  successStep.classList.remove('hidden');
+});
+
+/* Drag and drop opcional en escritorio */
+const dropZoneLabel = document.querySelector('label.drop-zone');
+['dragover','dragenter'].forEach(evt => {
+  dropZoneLabel.addEventListener(evt, (e) => { e.preventDefault(); dropZoneLabel.classList.add('dragover'); });
+});
+['dragleave','drop'].forEach(evt => {
+  dropZoneLabel.addEventListener(evt, (e) => { e.preventDefault(); dropZoneLabel.classList.remove('dragover'); });
+});
+dropZoneLabel.addEventListener('drop', (e) => {
+  const files = Array.from(e.dataTransfer.files);
+  selectedFiles = files;
+  refreshFilesPreview();
+});
+</script>
+</body>
+</html>
